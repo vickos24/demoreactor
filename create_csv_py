@@ -1,0 +1,62 @@
+import re
+import string
+def eliminar_duplicados():
+    status_unicos = set()
+    with open('C:\GitRepo\demoreactor\status.txt','r') as f:
+        for line in f.readlines():
+            status_unicos.add(line.strip())
+    return list(status_unicos)
+
+def limpiar_datos(statuses):
+    status_limpio = []
+    patron = r'[' + string.punctuation + ']'
+    for status in statuses:
+        linea = re.sub(patron, '', status)
+        status_limpio.append(linea)
+    return status_limpio
+
+def normalizar_datos(statuses):
+    status_normalizados = []
+    for status in statuses:
+        status_normalizados.append(status.lower())
+    return status_normalizados
+
+def identificar_status(statuses):
+    valores = []
+    for status in statuses:
+        if "all trails are open" in status:
+            valores.append([status, 1,1])
+        elif "all trail are closed" in status:
+            valores.append([status, 0,0])
+        elif "blanckets is closed" in status and "rope is open" in status:
+            valores.append([status,0,1])
+        elif "blanckets is open" in status and "rope is closed" in status:
+            valores.append([status,1,0])
+        elif "blanckets is closed" in status:
+            valores.append([status,0,0])
+        elif "rope is open" in status:
+            valores.append([status,0,1])
+        elif "blanckets is open" in status:
+            valores.append([status,1,0])
+        elif "rope is closed" in status:
+            valores.append([status,0,1])
+
+    return valores
+
+def main():
+
+    status_unicos = eliminar_duplicados()
+    status_limpios = limpiar_datos(status_unicos)
+    status_normalizados = normalizar_datos(status_limpios)
+    for status in status_normalizados:
+        print (status)
+    with open('C:\GitRepo\demoreactor\status.csv','w') as f:
+        import csv
+        headers = ['status', 'blanckets_creek','rope_mill']
+        writer = csv.writer(f)
+        writer.writerow(headers)
+        writer.writerows(identificar_status(status_normalizados))
+
+
+if __name__ == '__main__':
+    main()
